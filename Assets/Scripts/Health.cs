@@ -6,7 +6,7 @@ public class Health : MonoBehaviour
 
     public float currentHealth { get; private set; }
 
-    private void Awake()
+    private void Start()
     {
         currentHealth = maxHealth;
     }
