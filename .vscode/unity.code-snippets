@@ -1,0 +1,169 @@
+{
+    "MonoBehaviour": {
+        "prefix": "mono",
+        "body": [
+            "using UnityEngine;",
+            "",
+            "public class ${1:ClassName} : MonoBehaviour",
+            "{",
+            "    void Start()",
+            "    {",
+            "        $2",
+            "    }",
+            "",
+            "    void Update()",
+            "    {",
+            "        $3",
+            "    }",
+            "}"
+        ],
+        "description": "MonoBehaviour class template"
+    },
+    "ScriptableObject": {
+        "prefix": "so",
+        "body": [
+            "using UnityEngine;",
+            "",
+            "[CreateAssetMenu(fileName = \"${1:FileName}\", menuName = \"${2:MenuName}\")]",
+            "public class ${1:ClassName} : ScriptableObject",
+            "{",
+            "    $0",
+            "}"
+        ],
+        "description": "ScriptableObject class template"
+    },
+    "SerializeField": {
+        "prefix": "sf",
+        "body": "[SerializeField] private ${1:type} ${2:fieldName};",
+        "description": "SerializeField attribute"
+    },
+    "Debug.Log": {
+        "prefix": "log",
+        "body": "Debug.Log($1);",
+        "description": "Debug.Log"
+    },
+    "Debug.LogWarning": {
+        "prefix": "logw",
+        "body": "Debug.LogWarning($1);",
+        "description": "Debug.LogWarning"
+    },
+    "Debug.LogError": {
+        "prefix": "loge",
+        "body": "Debug.LogError($1);",
+        "description": "Debug.LogError"
+    },
+    "GetComponent": {
+        "prefix": "gc",
+        "body": "GetComponent<${1:Component}>()",
+        "description": "GetComponent<T>()"
+    },
+    "Start method": {
+        "prefix": "start",
+        "body": [
+            "void Start()",
+            "{",
+            "    $0",
+            "}"
+        ],
+        "description": "Unity Start method"
+    },
+    "Update method": {
+        "prefix": "update",
+        "body": [
+            "void Update()",
+            "{",
+            "    $0",
+            "}"
+        ],
+        "description": "Unity Update method"
+    },
+    "Awake method": {
+        "prefix": "awake",
+        "body": [
+            "void Awake()",
+            "{",
+            "    $0",
+            "}"
+        ],
+        "description": "Unity Awake method"
+    },
+    "OnEnable method": {
+        "prefix": "onenable",
+        "body": [
+            "void OnEnable()",
+            "{",
+            "    $0",
+            "}"
+        ],
+        "description": "Unity OnEnable method"
+    },
+    "OnDisable method": {
+        "prefix": "ondisable",
+        "body": [
+            "void OnDisable()",
+            "{",
+            "    $0",
+            "}"
+        ],
+        "description": "Unity OnDisable method"
+    },
+    "Coroutine": {
+        "prefix": "co",
+        "body": [
+            "private IEnumerator ${1:CoroutineName}()",
+            "{",
+            "    $2",
+            "    yield return ${3:null};",
+            "}"
+        ],
+        "description": "Coroutine method"
+    },
+    "StartCoroutine": {
+        "prefix": "sc",
+        "body": "StartCoroutine(${1:CoroutineName}());",
+        "description": "StartCoroutine call"
+    },
+    "WaitForSeconds": {
+        "prefix": "wfs",
+        "body": "yield return new WaitForSeconds(${1:seconds});",
+        "description": "WaitForSeconds yield"
+    },
+    "OnTriggerEnter": {
+        "prefix": "trigenter",
+        "body": [
+            "private void OnTriggerEnter(Collider other)",
+            "{",
+            "    $0",
+            "}"
+        ],
+        "description": "OnTriggerEnter"
+    },
+    "OnCollisionEnter": {
+        "prefix": "colenter",
+        "body": [
+            "private void OnCollisionEnter(Collision collision)",
+            "{",
+            "    $0",
+            "}"
+        ],
+        "description": "OnCollisionEnter"
+    },
+    "Singleton": {
+        "prefix": "singleton",
+        "body": [
+            "public static ${1:ClassName} Instance { get; private set; }",
+            "",
+            "void Awake()",
+            "{",
+            "    if (Instance != null && Instance != this)",
+            "    {",
+            "        Destroy(gameObject);",
+            "        return;",
+            "    }",
+            "    Instance = this;",
+            "    DontDestroyOnLoad(gameObject);",
+            "}"
+        ],
+        "description": "Singleton pattern for MonoBehaviour"
+    }
+}
