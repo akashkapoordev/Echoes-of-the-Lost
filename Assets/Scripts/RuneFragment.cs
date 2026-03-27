@@ -9,6 +9,7 @@ public class RuneFragment : MonoBehaviour
     {
         if(other.CompareTag("Player"))
         {
+            other.GetComponent<PlayerController>().RemoveRuneFragment(this);
             other.GetComponent<ScoreManager>().AddScore(10);
             BurstEffect();
             Destroy(this.gameObject);
@@ -16,7 +17,7 @@ public class RuneFragment : MonoBehaviour
           
         }
     }
-
+    
     private void BurstEffect()
     {
        GameObject effect =  Instantiate(burstEffect, transform.position, Quaternion.identity);

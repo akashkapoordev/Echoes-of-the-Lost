@@ -1,14 +1,17 @@
+using TMPro;
 using UnityEngine;
 
 public class Health : MonoBehaviour
 {
     [SerializeField] float maxHealth;
+    [SerializeField] TextMeshProUGUI health;
 
     public float currentHealth { get; private set; }
 
     private void Start()
     {
         currentHealth = maxHealth;
+        health.text = "Health : " + currentHealth.ToString();
     }
 
     public void TakeDamage(float amount)
@@ -16,7 +19,7 @@ public class Health : MonoBehaviour
         if(!IsDead())
             {
             currentHealth = Mathf.Max(0, currentHealth - amount);
-            Debug.Log(currentHealth);
+            health.text = "Health : " + currentHealth.ToString();
         }
       
 
@@ -30,7 +33,7 @@ public class Health : MonoBehaviour
 
     public bool IsDead()
     {
-        if (currentHealth <= 0) return true;
+        if (currentHealth < 0) return true;
 
         return false;
     }
