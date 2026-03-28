@@ -1,20 +1,19 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour,IDamageable,IRevealable
 {
     InputAction moveAction;
     [SerializeField] float moveSpeed;
     [SerializeField] GameObject gameoverPanel;
     [SerializeField] List<RuneFragment> list;
-
-    private Health health;
+    [SerializeField] private float health = 100;
+    public float Health => health;
 
     private void Start()
     {
         gameoverPanel.SetActive(false);
         moveAction = InputSystem.actions.FindAction("Move");
-        health = GetComponent<Health>();
     }
 
     private void Update()
@@ -35,9 +34,10 @@ public class PlayerController : MonoBehaviour
     {
         if (other.gameObject.CompareTag("Enemy"))
         {
-            if(!health.IsDead())
+            if(!IsDead())
             {
-                health.TakeDamage(10);
+                TakeDamage(10);
+                
             }
             else
             {
@@ -51,5 +51,27 @@ public class PlayerController : MonoBehaviour
     public void RemoveRuneFragment(RuneFragment runeFragment)
     {
         list.Remove(runeFragment);
+    }
+
+    public virtual void TakeDamage(float amount)
+    {
+        health -= amount;
+        //Debug.Log($"{gameObject.name} took {amount} damage. Remaining health: {health}");
+        if (health <= 0)
+        {
+            Die();
+        }
+    }
+
+    public  void Die()
+    {
+        Debug.Log($"{gameObject.name}" + " died");
+    }
+
+    public bool IsDead() => health <= 0;
+
+    public virtual void Reveal()
+    {
+        Debug.Log("Player Reveal");
     }
 }    

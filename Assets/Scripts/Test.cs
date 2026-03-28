@@ -1,14 +1,22 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
-public class Test : MonoBehaviour
+public class test : MonoBehaviour
 {
-    [SerializeField] Health health;
-
-
-
-    private void Start()
+    private void Update()
     {
-        health.TakeDamage(50);
-        //Debug.Log( health.currentHealth);
+        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        {
+            MonoBehaviour[] allObjects = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None);
+
+            foreach (var obj in allObjects)
+            {
+                if (obj is IDamageable damageable)
+                {
+                    damageable.TakeDamage(5);
+                    Debug.Log($"Damaged {obj.gameObject.name} via IDamageable");
+                }
+            }
+        }
     }
 }
