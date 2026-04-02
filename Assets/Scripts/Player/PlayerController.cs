@@ -1,28 +1,46 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-public class PlayerController : MonoBehaviour,IDamageable,IRevealable
+public class PlayerController : MonoBehaviour, IDamageable, IRevealable
 {
-    InputAction moveAction;
-    [SerializeField] float moveSpeed;
-    [SerializeField] GameObject gameoverPanel;
-    [SerializeField] List<RuneFragment> list;
-    [SerializeField] private float health = 100;
-    public float Health => health;
+    private InputAction moveAction;
+    [SerializeField] private float moveSpeed;
+    [SerializeField] private GameObject gameoverPanel;
+    [SerializeField] private List<RuneFragment> list;
+    private Health healthPlayer;
+    public float Health => healthPlayer.currentHealth;
 
+    private void Awake()
+    {
+        healthPlayer = GetComponent<Health>();
+    }
     private void Start()
     {
         gameoverPanel.SetActive(false);
         moveAction = InputSystem.actions.FindAction("Move");
+       
+    }
+
+    private void OnEnable()
+    {
+        healthPlayer.OnDamaged += TakeDamage;
+        healthPlayer.OnDied += HandleDeath;
+    }
+
+    private void HandleDeath()
+    {
+        gameoverPanel.SetActive(true);
+        this.enabled = false;
     }
 
     private void Update()
     {
         Vector2 moveValue = moveAction.ReadValue<Vector2>();
 
-        transform.Translate(moveValue.x * moveSpeed * Time.deltaTime, 0, moveValue.y *moveSpeed * Time.deltaTime);
+        transform.Translate(moveValue.x * moveSpeed * Time.deltaTime, 0, moveValue.y * moveSpeed * Time.deltaTime);
 
-        if(list.Count == 0)
+        if (list.Count == 0)
         {
             Debug.Log("You win");
             return;
@@ -34,17 +52,8 @@ public class PlayerController : MonoBehaviour,IDamageable,IRevealable
     {
         if (other.gameObject.CompareTag("Enemy"))
         {
-            if(!IsDead())
-            {
-                TakeDamage(10);
-                
-            }
-            else
-            {
-                gameoverPanel.SetActive(true);
-                this.enabled = false;
-            }
-            
+            TakeDamage(10);
+
         }
     }
 
@@ -55,23 +64,24 @@ public class PlayerController : MonoBehaviour,IDamageable,IRevealable
 
     public virtual void TakeDamage(float amount)
     {
-        health -= amount;
-        //Debug.Log($"{gameObject.name} took {amount} damage. Remaining health: {health}");
-        if (health <= 0)
-        {
-            Die();
-        }
+        healthPlayer.TakeDamage(amount);
     }
 
-    public  void Die()
+    public void Die()
     {
         Debug.Log($"{gameObject.name}" + " died");
     }
 
-    public bool IsDead() => health <= 0;
+    public bool IsDead() => healthPlayer.IsDead();
 
     public virtual void Reveal()
     {
         Debug.Log("Player Reveal");
     }
-}    
+
+    private void OnDisable()
+    {
+        healthPlayer.OnDamaged -= TakeDamage;
+        healthPlayer.OnDied -= HandleDeath;
+    }
+}

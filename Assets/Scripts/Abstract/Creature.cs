@@ -22,7 +22,7 @@ public abstract class Creature : Entity, IDamageable, IRevealable
         Debug.Log($"{gameObject.name}" + " died");
     }
 
-    public virtual void Reveal()
+    public override void Reveal()
     {
         Debug.Log($"{gameObject.name}" + "revealed");
     }
