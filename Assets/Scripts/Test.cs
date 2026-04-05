@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+#if UNITY_EDITOR
 public class test : MonoBehaviour
 {
     private void Update()
@@ -13,10 +14,11 @@ public class test : MonoBehaviour
             {
                 if (obj is IDamageable damageable)
                 {
-                    damageable.TakeDamage(5);
+                    damageable.OnDamagedReceived(5);
                     Debug.Log($"Damaged {obj.gameObject.name} via IDamageable");
                 }
             }
         }
     }
 }
+#endif

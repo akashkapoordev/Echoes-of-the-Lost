@@ -1,14 +1,15 @@
 using UnityEngine;
 
-public class Landmark : Entity, IInteractable, IRevealable
+public class Landmark : Entity, IInteractable
 {
-    public void Intercat()
+    public void Interact()
     {
         Debug.Log("interact");
     }
 
-    public override void Reveal()
+public override void Reveal()
     {
         base.Reveal();
+        Debug.Log($"{gameObject.name} landmark revealed");
     }
 }

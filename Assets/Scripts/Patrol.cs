@@ -2,20 +2,38 @@ using UnityEngine;
 
 public class Patrol : MonoBehaviour
 {
-    [SerializeField] Transform[] waypoints;
-    [SerializeField] Transform player;
-    [SerializeField] float speed = 5f;
-    private  int currentIndex = 0;
+    [SerializeField] private Transform[] waypoints;
+    private Transform player;
+    [SerializeField] private CreatureConfig creatureConfig;
+    [SerializeField] private float speed = 5f;
+    private int currentIndex = 0;
+    private Renderer cachedRenderer;
     private float waitTime = 1f;
     private float waitTimer = 0;
     private CreatureState creatureState;
-    private Renderer currentColor;
+    private Material currentColor;
+    private float detectionRange;
+    private float loseRange;
 
+private void Awake()
+    {
+        cachedRenderer = GetComponent<Renderer>();
+    }
 
     private void Start()
     {
-        currentColor = GetComponent<Renderer>();
+        currentColor = cachedRenderer.material;
         creatureState = CreatureState.IDLE;
+
+        GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null) player = playerObj.transform;
+
+        if (creatureConfig != null)
+        {
+            speed = creatureConfig.maxSpeed;
+            detectionRange = creatureConfig.detectionRange;
+            loseRange = creatureConfig.detectionRange * 1.5f;
+        }
     }
 
     private void Update()
@@ -24,7 +42,7 @@ public class Patrol : MonoBehaviour
         switch (creatureState)
         {
             case CreatureState.IDLE:
-                currentColor.material.color = Color.grey;
+                currentColor.color = Color.grey;
                 waitTimer += Time.deltaTime;
                 if(waitTimer >= waitTime)
                 {
@@ -33,17 +51,17 @@ public class Patrol : MonoBehaviour
                 }
                 break;
             case CreatureState.PATROL:
-                currentColor.material.color = Color.yellow;
+                currentColor.color = Color.yellow;
                 EnemyPatrol();
-                if(Vector3.Distance(transform.position,player.transform.position)<10)
+                if(Vector3.Distance(transform.position, player.transform.position) < detectionRange)
                 {
                     creatureState = CreatureState.CHASE;
                 }
                 break;
             case CreatureState.CHASE:
-                currentColor.material.color = Color.red;
+                currentColor.color = Color.red;
                 transform.position = Vector3.MoveTowards(transform.position, player.position, speed * Time.deltaTime);
-                if (Vector3.Distance(transform.position, player.transform.position) >15 )
+                if (Vector3.Distance(transform.position, player.transform.position) > loseRange)
                 {
                     creatureState = CreatureState.PATROL;
                 }

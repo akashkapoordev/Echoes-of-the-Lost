@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -7,7 +6,8 @@ public class PlayerController : MonoBehaviour, IDamageable, IRevealable
     private InputAction moveAction;
     [SerializeField] private float moveSpeed;
     [SerializeField] private GameObject gameoverPanel;
-    [SerializeField] private List<RuneFragment> list;
+    [SerializeField] private List<RuneFragment> runeFragments;
+    private bool hasWon = false;
     private Health healthPlayer;
     public float Health => healthPlayer.currentHealth;
 
@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IRevealable
 
     private void OnEnable()
     {
-        healthPlayer.OnDamaged += TakeDamage;
+        healthPlayer.OnDamaged += OnDamagedReceived;
         healthPlayer.OnDied += HandleDeath;
     }
 
@@ -34,42 +34,41 @@ public class PlayerController : MonoBehaviour, IDamageable, IRevealable
         this.enabled = false;
     }
 
-    private void Update()
+private void Update()
     {
         Vector2 moveValue = moveAction.ReadValue<Vector2>();
-
         transform.Translate(moveValue.x * moveSpeed * Time.deltaTime, 0, moveValue.y * moveSpeed * Time.deltaTime);
 
-        if (list.Count == 0)
+        if (!hasWon && runeFragments.Count == 0)
         {
-            Debug.Log("You win");
-            return;
+            hasWon = true;
+            Debug.Log("You win!");
         }
-
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.CompareTag("Enemy"))
         {
-            TakeDamage(10);
+            healthPlayer.TakeDamage(10);
 
         }
     }
 
-    public void RemoveRuneFragment(RuneFragment runeFragment)
+public void RemoveRuneFragment(RuneFragment runeFragment)
     {
-        list.Remove(runeFragment);
+        runeFragments.Remove(runeFragment);
     }
 
-    public virtual void TakeDamage(float amount)
+    public virtual void OnDamagedReceived(float amount)
     {
-        healthPlayer.TakeDamage(amount);
+        Debug.Log($"Took {amount} damage! Health: {healthPlayer.currentHealth}");
     }
 
-    public void Die()
+public void Die()
     {
-        Debug.Log($"{gameObject.name}" + " died");
+        Debug.Log($"{gameObject.name} died");
+        HandleDeath();
     }
 
     public bool IsDead() => healthPlayer.IsDead();
@@ -81,7 +80,7 @@ public class PlayerController : MonoBehaviour, IDamageable, IRevealable
 
     private void OnDisable()
     {
-        healthPlayer.OnDamaged -= TakeDamage;
+        healthPlayer.OnDamaged -= OnDamagedReceived;
         healthPlayer.OnDied -= HandleDeath;
     }
 }

@@ -1,29 +1,50 @@
-using System;
 using UnityEngine;
 
-public abstract class Creature : Entity, IDamageable, IRevealable
+public abstract class Creature : Entity, IDamageable
 {
-    [SerializeField] private float health = 100f;
+    [SerializeField] protected CreatureConfig creatureConfig;
+    protected Health health;
 
 
-    public float Health => health;
+    public float Health => health != null ? health.currentHealth : 0f;
 
-    public virtual void TakeDamage(float amount)
+public virtual void OnDamagedReceived(float amount)
     {
-        health -= amount;
-        if(health <= 0)
+        if (health != null)
         {
-            Die();
+            health.TakeDamage(amount);
         }
     }
 
-    public virtual void Die()
+public virtual void Die()
     {
-        Debug.Log($"{gameObject.name}" + " died");
+        Debug.Log($"{gameObject.name} died");
     }
 
-    public override void Reveal()
+public bool IsDead() => health != null && health.IsDead();
+
+
+public override void Reveal()
     {
-        Debug.Log($"{gameObject.name}" + "revealed");
+        IsRevealed = true;
+        Debug.Log($"{gameObject.name} revealed");
     }
+
+protected virtual void OnDisable()
+    {
+        if (health != null) { health.OnDied -= Die; }
+    }
+
+
+
+protected virtual void Awake()
+    {
+        health = GetComponent<Health>();
+    }
+
+protected virtual void OnEnable()
+    {
+        if (health != null) { health.OnDied += Die; }
+    }
+
 }
