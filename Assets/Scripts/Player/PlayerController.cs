@@ -1,12 +1,23 @@
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 public class PlayerController : MonoBehaviour, IDamageable, IRevealable
 {
-    private InputAction moveAction;
+    [Header("Input Action")]
+    [SerializeField] private InputActionReference moveAction;
+    [SerializeField] private InputActionReference jumpAaction;
+
     [SerializeField] private float moveSpeed;
     [SerializeField] private GameObject gameoverPanel;
     [SerializeField] private List<RuneFragment> runeFragments;
+    [SerializeField] private CharacterController characterController;
+
+
+    private bool isGrounded;
+    private float jumpHeight = 1.5f;
+    private float gravityValue = -20f;
+    private Vector2 playerVelocity;
     private bool hasWon = false;
     private Health healthPlayer;
     public float Health => healthPlayer.currentHealth;
@@ -17,8 +28,9 @@ public class PlayerController : MonoBehaviour, IDamageable, IRevealable
     }
     private void Start()
     {
+        moveAction.action.Enable();
+        jumpAaction.action.Enable();
         gameoverPanel.SetActive(false);
-        moveAction = InputSystem.actions.FindAction("Move");
        
     }
 
@@ -36,8 +48,17 @@ public class PlayerController : MonoBehaviour, IDamageable, IRevealable
 
 private void Update()
     {
-        Vector2 moveValue = moveAction.ReadValue<Vector2>();
-        transform.Translate(moveValue.x * moveSpeed * Time.deltaTime, 0, moveValue.y * moveSpeed * Time.deltaTime);
+        isGrounded = characterController.isGrounded;
+
+        //if(isGrounded)
+        //{
+        //    if(playerVelocity.y < -2f)
+        //    {
+        //        playerVelocity.y = 2f;
+        //    }
+        //}
+
+        HandleMovement();
 
         if (!hasWon && runeFragments.Count == 0)
         {
@@ -78,8 +99,35 @@ public void Die()
         Debug.Log("Player Reveal");
     }
 
+    private void HandleMovement()
+    {
+        Vector2 input = moveAction.action.ReadValue<Vector2>();
+        Vector3 move = new Vector3(input.x, 0, input.y);
+        move = Vector3.ClampMagnitude(move, 1f);
+
+        if(move != Vector3.zero)
+        {
+            transform.forward = move;
+        }
+
+        //jump 
+        if(isGrounded & jumpAaction.action.WasPerformedThisFrame())
+        {
+            playerVelocity.y = Mathf.Sqrt(jumpHeight * -2f * gravityValue);
+        }
+
+        //applygravity
+        playerVelocity.y += gravityValue * Time.deltaTime;
+
+        //move
+        Vector3 finalMove = move * moveSpeed + Vector3.up * playerVelocity.y;
+        characterController.Move(finalMove * Time.deltaTime);
+    }
+
     private void OnDisable()
     {
+        moveAction.action.Disable();
+        jumpAaction.action.Disable();
         healthPlayer.OnDamaged -= OnDamagedReceived;
         healthPlayer.OnDied -= HandleDeath;
     }
